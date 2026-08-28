@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { POST as esignPost } from '../app/api/foxit/esign/route.ts';
+import { POST as pdfPost } from '../app/api/foxit/pdf/route.ts';
+import { GET as statusGet } from '../app/api/foxit/status/route.ts';
+import { createRun } from '../lib/run-registry.ts';
+const pdf=Buffer.from('%PDF-test');const hash=createHash('sha256').update(pdf).digest('hex');
+const request=(body:object)=>new Request('http://localhost/api/foxit/esign',{method:'POST',headers:{'content-type':'application/json','origin':'http://localhost:3001'},body:JSON.stringify(body)});
+test('missing operator approval blocks eSign',async()=>{delete process.env.SIGNFENCE_ESIGN_SEND_ENABLED;assert.equal((await esignPost(request({}))).status,423)});
+test('invalid recipient is rejected',async()=>{process.env.SIGNFENCE_ESIGN_SEND_ENABLED='true';process.env.SIGNFENCE_OPERATOR_MODE='true';const response=await esignPost(request({runId:createRun(),recipient:'bad',pdfBase64:pdf.toString('base64'),approvedPdfHash:hash,currentPdfHash:hash,humanApprovalRecorded:true,contract:{}}));assert.equal(response.status,400);delete process.env.SIGNFENCE_ESIGN_SEND_ENABLED;delete process.env.SIGNFENCE_OPERATOR_MODE});
+test('tampered PDF and false hashes are rejected',async()=>{process.env.SIGNFENCE_ESIGN_SEND_ENABLED='true';process.env.SIGNFENCE_OPERATOR_MODE='true';const response=await esignPost(request({runId:createRun(),recipient:'test@example.invalid',pdfBase64:pdf.toString('base64'),approvedPdfHash:'0'.repeat(64),currentPdfHash:'0'.repeat(64),humanApprovalRecorded:true,contract:{}}));assert.equal(response.status,409);assert.equal((await response.json()).error,'SERVER_PDF_HASH_MISMATCH');delete process.env.SIGNFENCE_ESIGN_SEND_ENABLED;delete process.env.SIGNFENCE_OPERATOR_MODE});
+test('public deployment blocks paid PDF API',async()=>{delete process.env.SIGNFENCE_OPERATOR_MODE;const response=await pdfPost(new Request('http://localhost/api/foxit/pdf',{method:'POST',headers:{'content-type':'application/json'},body:'{}'}));assert.equal(response.status,403);assert.equal((await response.json()).error,'OPERATOR_MODE_DISABLED')});
+test('public deployment blocks status API',async()=>{delete process.env.SIGNFENCE_OPERATOR_MODE;const response=await statusGet(new Request('http://localhost/api/foxit/status?runId=anything'));assert.equal(response.status,403);assert.equal((await response.json()).error,'OPERATOR_MODE_DISABLED')});

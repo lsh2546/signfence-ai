@@ -1,0 +1,19 @@
+.parties small,
+.terms span,
+.amount-grid label,
+.kicker,
+.api-badge,
+.gate-code small,
+.audit-log,
+.verified-proof {
+  font-size: 10px;
+}
+
+@media (max-width: 560px) {
+  .app-shell { padding-inline: 12px; }
+  .panel { padding: 14px; }
+  .hero h1 { font-size: 38px; }
+  .flow div { min-height: 44px; }
+  .check-list small { font-size: 11px; line-height: 1.45; }
+  .verified-proof { grid-template-columns: 1fr; }
+}
