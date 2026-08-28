@@ -14,11 +14,11 @@ export function structureContract(text: string): ContractData {
   const effective = first(source, [/(?:효력일|시작일|effective)\s*[:：]?\s*(\d{4}[-./]\d{1,2}[-./]\d{1,2})/i]) ?? '2026-09-01';
   const deliverables = first(source, [/(?:결과물|납품물)(?:은|는)?\s*[:：]?\s*(?:상품\s*이미지\s*)?(\d+)\s*개/i]);
   const revisions = first(source, [/(?:수정)(?:은|는)?\s*(?:최대)?\s*[:：]?\s*(\d+)\s*회/i]);
-  const copyright = first(source, [/(결과물의\s*저작권은\s*(?:계약금|대금)\s*전액을?\s*지급한\s*후\s*판매자에게\s*이전됩니다)/i]);
+  const copyright = first(source, [/(결과물의\s*저작권은\s*계약\s*대금\s*전액이?\s*지급된\s*후\s*판매자에게\s*이전됩니다)/i]);
   if (!parties || !main || !due || !deliverables || !revisions || !copyright) throw new Error('STRUCTURE_REQUIRED_FIELD_MISSING');
   const normalizedDate = (v: string) => v.replace(/년\s*|월\s*/g, '-').replace(/일/g, '').replace(/[./]/g, '-').replace(/-(\d)(?=-|$)/g, '-0$1');
-  const copyrightTransferCondition = 'Only after full payment';
-  const extraClauses = [{ text: 'Copyright in the deliverables transfers to the seller only after full payment.', approved: true }];
+  const copyrightTransferCondition = 'Only after the full contract amount has been paid / 계약 대금 전액 지급 후';
+  const extraClauses = [{ text: 'Copyright transfers to the seller only after the full contract amount has been paid.', approved: true }];
   const fallbackSchedule = schedule ?? amounts[1]?.[1] ?? main;
   return {
     partyA: parties[1].trim()==='온라인 판매자'?'Online seller':parties[1].trim(), partyB: parties[2].trim()==='외주 디자이너'?'Freelance designer':parties[2].trim(), amount: money(main), paymentScheduleAmount: money(fallbackSchedule),

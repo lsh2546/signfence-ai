@@ -4,7 +4,7 @@ import type { ContractData } from '../lib/contract.ts';
 import { signatureGate, validateContract } from '../lib/contract.ts';
 
 process.env.SIGNFENCE_OPERATOR_MODE='true';
-const base:ContractData={partyA:'Synthetic Online Store',partyB:'Synthetic Design Studio',amount:1200000,paymentScheduleAmount:1020000,effectiveDate:'2026-09-01',dueDate:'2026-09-30',obligations:['Create ten synthetic product images','Provide up to two revision rounds'],copyrightTransferCondition:'계약금 전액 지급 후',requiredClauses:['scope','payment','delivery','copyright'],extraClauses:[{text:'결과물의 저작권은 계약금 전액을 지급한 후 판매자에게 이전됩니다',approved:true}]};
+const base:ContractData={partyA:'Synthetic Online Store',partyB:'Synthetic Design Studio',amount:1200000,paymentScheduleAmount:1020000,effectiveDate:'2026-09-01',dueDate:'2026-09-30',obligations:['Create ten synthetic product images','Provide up to two revision rounds'],copyrightTransferCondition:'Only after the full contract amount has been paid / 계약 대금 전액 지급 후',requiredClauses:['scope','payment','delivery','copyright'],extraClauses:[{text:'Copyright transfers to the seller only after the full contract amount has been paid.',approved:true}]};
 async function processPdf(contract:ContractData){
  const request=new Request('http://localhost/api/foxit/pdf',{method:'POST',headers:{'content-type':'application/json','origin':'http://localhost:3001'},body:JSON.stringify({contract})});
  const response=await POST(request);const data=await response.json();if(!response.ok)throw new Error(data.error??`HTTP_${response.status}`);

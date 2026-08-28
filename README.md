@@ -51,11 +51,13 @@ Operator-only path
 2. Contract and payment-schedule amounts
 3. Effective and due dates
 4. Obligations
-5. Required clauses, including **Copyright transfers only after full payment**
+5. Required clauses, including **Copyright transfers only after the full contract amount has been paid**
 6. Unapproved additional clauses
 7. Post-approval document change
 
 The copyright condition remains part of check 5; it is not an eighth check.
+
+The Korean synthetic demo prompt preserves the condition `계약 대금 전액 지급 후`, rendered in English as “only after the full contract amount has been paid.”
 
 ## Single signature gate
 

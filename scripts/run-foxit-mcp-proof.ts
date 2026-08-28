@@ -9,7 +9,7 @@ import { structureContract } from '../lib/structure.ts';
 import { buildContractDocumentText } from '../lib/document.ts';
 import { validateContract } from '../lib/contract.ts';
 
-const prompt = '온라인 판매자와 외주 디자이너 간 상품 이미지 제작 계약을 작성해 주세요. 계약 본문의 총액은 1,200,000원이고 지급 일정표에는 1,020,000원으로 기재되어 있습니다. 결과물은 상품 이미지 10개, 수정은 최대 2회, 납기일은 2026년 9월 30일입니다. 결과물의 저작권은 계약금 전액을 지급한 후 판매자에게 이전됩니다.';
+const prompt = '온라인 판매자와 외주 디자이너 간 상품 이미지 제작 계약을 작성해 주세요. 계약 본문의 총액은 1,200,000원이고 지급 일정표에는 1,020,000원으로 기재되어 있습니다. 결과물은 상품 이미지 10개, 수정은 최대 2회, 납기일은 2026년 9월 30일입니다. 결과물의 저작권은 계약 대금 전액이 지급된 후 판매자에게 이전됩니다.';
 const root = process.cwd();
 const serverPath = path.resolve(root, '..', 'foxit-pdf-api-mcp-server', 'typescript', 'foxit-pdf-api-mcp-server', 'dist', 'stdio-server.js');
 const privateDir = path.resolve(root, 'private-evidence', 'mcp');
