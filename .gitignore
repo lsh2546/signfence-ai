@@ -47,4 +47,8 @@ next-env.d.ts
 /dist/
 /.wrangler/
 /outputs/
+/output/
+/tmp/
+/video/
+/*.mp4
 /work/

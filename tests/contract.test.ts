@@ -4,7 +4,7 @@ import { signatureGate, validateContract, type ContractData } from '../lib/contr
 import { structureContract } from '../lib/structure.ts';
 import { bindFolder, createRun } from '../lib/run-registry.ts';
 import { GET as statusGet } from '../app/api/foxit/status/route.ts';
-import { buildContractDocumentText } from '../lib/document.ts';
+import { buildContractDocumentText, buildContractPdfBytes } from '../lib/document.ts';
 const sentence='온라인 판매자와 외주 디자이너 간 상품 이미지 제작 계약을 작성해 주세요. 계약 본문의 총액은 1,200,000원이고 지급 일정표에는 1,020,000원으로 기재되어 있습니다. 결과물은 상품 이미지 10개, 수정은 최대 2회, 납기일은 2026년 9월 30일입니다. 결과물의 저작권은 계약 대금 전액이 지급된 후 판매자에게 이전됩니다.';
 const valid:ContractData={partyA:'A',partyB:'B',amount:1200,paymentScheduleAmount:1200,effectiveDate:'2026-09-01',dueDate:'2026-09-30',obligations:['Create 10 product images','Complete a maximum of 2 revision rounds'],copyrightTransferCondition:'Only after the full contract amount has been paid / 계약 대금 전액 지급 후',requiredClauses:['scope','payment','delivery','copyright'],extraClauses:[{text:'Copyright transfers to the seller only after the full contract amount has been paid.',approved:true}]};
 test('all seven deterministic checks pass',()=>assert.equal(validateContract(valid).filter(c=>c.passed).length,7));
@@ -21,3 +21,5 @@ test('regenerated document preserves the structured copyright condition',()=>{co
 test('actual document change blocks approval',()=>assert.equal(signatureGate({checks:validateContract({...valid,amount:1201,paymentScheduleAmount:1201},true),humanApprovalRecorded:true,approvedPdfHash:'old',currentPdfHash:'new'}),false));
 test('duplicate eSign is blocked',()=>{const id=createRun();bindFolder(id,'100');assert.throws(()=>bindFolder(id,'101'),/DUPLICATE_ESIGN_BLOCKED/)});
 test('arbitrary folder ID cannot be queried',async()=>{process.env.SIGNFENCE_OPERATOR_MODE='true';const response=await statusGet(new Request('http://localhost/api/foxit/status?runId=attacker-folder'));assert.equal(response.status,404);delete process.env.SIGNFENCE_OPERATOR_MODE});
+test('public demo creates a real PDF file',()=>{const bytes=buildContractPdfBytes(valid);assert.equal(Buffer.from(bytes.subarray(0,4)).toString('ascii'),'%PDF');assert.match(Buffer.from(bytes).toString('ascii'),/%%EOF/)});
+test('English prompt structures the same contract',()=>{const value=structureContract('Create a product-image services agreement between an online seller and a freelance designer. The contract total is KRW 1,200,000, while the payment schedule states KRW 1,020,000. Deliverables are 10 product images, with up to 2 revision rounds, due September 30, 2026. Copyright transfers to the seller only after the full contract amount has been paid.');assert.equal(value.partyA,'online seller');assert.equal(value.partyB,'freelance designer');assert.equal(value.amount,1200000);assert.equal(value.paymentScheduleAmount,1020000);assert.equal(value.dueDate,'2026-09-30')});
